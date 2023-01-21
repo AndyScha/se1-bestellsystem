@@ -2,9 +2,12 @@ package system.impl;
 
 import datamodel.Article;
 import datamodel.Customer;
+import datamodel.Order;
 import datamodel.TAX;
 import system.DatamodelFactory;
+import system.InventoryManager;
 import system.OrderBuilder;
+import system.Repository;
 
 
 /**
@@ -20,6 +23,14 @@ class OrderBuilderImpl implements OrderBuilder {
 	 * Factory from which objects are built.
 	 */
 	private final DatamodelFactory factory;
+	/**
+	 * InventoryManager.
+	 */
+	private final InventoryManager inventoryManager;
+	/**
+	 * orderRepository.
+	 */
+	private final Repository orderRepository;
 
 
 	/**
@@ -27,8 +38,10 @@ class OrderBuilderImpl implements OrderBuilder {
 	 * 
 	 * @param factory factory from which objects are built.
 	 */
-	public OrderBuilderImpl(DatamodelFactory datamodelFactory) {
+	public OrderBuilderImpl(DatamodelFactory datamodelFactory, InventoryManager inventoryManager, Repository orderRepository) {
 		this.factory = datamodelFactory;
+		this.inventoryManager = inventoryManager;
+		this.orderRepository = orderRepository;
 	}
 
 
@@ -158,5 +171,24 @@ class OrderBuilderImpl implements OrderBuilder {
 				.addItem(karte, 1);
 		//
 		return this;
+	}
+	
+	/**
+	   * Accept an order only if sufficient inventory is in stock that can meet
+	   * all ordered items. An accepted order is saved to the OrderRepository.
+	   *
+	   * @param order order to accept.
+	   * @return true if order accepted.
+	   */
+	@Override
+	public boolean accept(Order order) {
+	    //
+	    boolean acceptOrder = inventoryManager.isFillable(order);
+	    //
+	    if(acceptOrder) {
+	    inventoryManager.fill(order);
+	    orderRepository.save(order);
+	    }
+	    return acceptOrder;
 	}
 }

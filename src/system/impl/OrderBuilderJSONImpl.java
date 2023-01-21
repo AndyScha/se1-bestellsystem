@@ -16,7 +16,9 @@ import datamodel.Customer;
 import datamodel.Order;
 import datamodel.TAX;
 import system.DatamodelFactory;
+import system.InventoryManager;
 import system.OrderBuilder;
+import system.Repository;
 
 
 /**
@@ -42,6 +44,14 @@ class OrderBuilderJSONImpl implements OrderBuilder {
 	 * Indicator that orders have been loaded.
 	 */
 	private boolean loaded = false;
+	/**
+	 * InventoryManager.
+	 */
+	private final InventoryManager inventoryManager;
+	/**
+	 * orderRepository.
+	 */
+	private final Repository orderRepository;
 
 
 	/**
@@ -49,9 +59,11 @@ class OrderBuilderJSONImpl implements OrderBuilder {
 	 * 
 	 * @param factory injected dependency of factory from which objects are created.
 	 */
-	OrderBuilderJSONImpl(DatamodelFactory factory, Properties properties) {
+	OrderBuilderJSONImpl(DatamodelFactory factory, Properties properties, InventoryManager inventoryManager, Repository orderRepository) {
 		this.factory = factory;
 		this.properties = properties;
+		this.inventoryManager = inventoryManager;
+		this.orderRepository = orderRepository;
 	}
 
 
@@ -275,4 +287,23 @@ class OrderBuilderJSONImpl implements OrderBuilder {
 		//
 		return count;
 	}
-}
+	
+	/**
+	   * Accept an order only if sufficient inventory is in stock that can meet
+	   * all ordered items. An accepted order is saved to the OrderRepository.
+	   *
+	   * @param order order to accept.
+	   * @return true if order accepted.
+	   */
+	@Override
+	public boolean accept(Order order) {
+	    //
+	    boolean acceptOrder = inventoryManager.isFillable(order);
+	    //
+	    if(acceptOrder) {
+	    inventoryManager.fill(order);
+	    orderRepository.save(order);
+	    }
+	    return acceptOrder;
+	}
+}}
