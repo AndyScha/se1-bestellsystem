@@ -1,7 +1,8 @@
 package system;
 
-
 import java.util.Properties;
+
+import datamodel.Order;
 
 /**
  * Interface of an "Inversion-of-Control" (IoC) container, which creates and holds
@@ -21,10 +22,6 @@ public interface IoC {
 	static IoC getInstance() {
 		return system.impl.IoC_ContainerImpl.getInstance();
 	}
-
-	DatamodelFactory getDatamodelFactory();
-
-	OrderBuilder getOrderBuilder();
 
 
 	/**
@@ -47,13 +44,26 @@ public interface IoC {
 	 * @return reference to singleton Printer instance.
 	 */
 	Printer getPrinter();
+	
+	/**
+	 * Getter of system singleton component that implements the {@link DatamodelFactory} interface.
+	 * 
+	 * @return reference to singleton DatamodelFactory instance.
+	 */
+	DatamodelFactory getDatamodelFactory();
 
+	/**
+	 * Getter of system singleton component that implements the {@link OrderBuilder} interface.
+	 * 
+	 * @return reference to singleton OrderBuilder instance.
+	 */
+	OrderBuilder getOrderBuilder();
+	
 	/**
 	 * Getter of system singleton component that contains system properties.
 	 * @return reference to singleton Properties instance.
 	 */
 	Properties getProperties();
-
 	/**
 	 * Load properties from file from propertyFilePath.
 	 *
@@ -62,6 +72,18 @@ public interface IoC {
 	 * @throws IllegalArgumentException when propertyFilePath is null or empty "".
 	 */
 	int loadProperties(String propertyFilePath);
-
-
+	
+	/**
+	 * Return singleton instance of InventoryManager.
+	 *
+	 * @return singleton instance of InventoryManager.
+	 */
+	InventoryManager getInventoryManager();
+	
+	/**
+	 * Return singleton instance of Order Repository.
+	 *
+	 * @return singleton instance of Order Repository.
+	 */
+	Repository<Order, String> getOrderRepository();
 }

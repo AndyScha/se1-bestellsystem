@@ -306,4 +306,4 @@ class OrderBuilderJSONImpl implements OrderBuilder {
 	    }
 	    return acceptOrder;
 	}
-}}
+}
