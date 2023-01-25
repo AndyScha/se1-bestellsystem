@@ -6,7 +6,6 @@ import java.util.Map;
 import datamodel.Article;
 import datamodel.InventoryItem;
 import datamodel.Order;
-import datamodel.generated.OrderItem;
 import system.DatamodelFactory;
 import system.InventoryManager;
 import system.Repository;
