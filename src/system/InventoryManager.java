@@ -4,78 +4,47 @@ import datamodel.Order;
 
 
 /**
- * Public interface of the InventoryManager that manages the inventory
- * of articles. InventoryManager uses (and hides) the Article repository.
+ * InventoryManager is a component of the order processing system
+ * that manages the inventory of articles that is available for sale.
  * 
- * @author sgra64
- *
+ * An order can be filled only when sufficient inventory (current
+ * number of available units for each article) is available for all
+ * items on an order.
+ * 
+ * For example, with inventory:
+ *  {@code id: "SKU-458362", "description": "Tasse", "units": 48 },
+ *  {@code id: "SKU-693856", "description": "Becher", "units": 4 }.
+ * 
+ * Order:
+ *   {"id": 8592356245, "customer_id": 892474,
+ *     "items": [
+ *       {"article_id": "SKU-458362", "units": 4 },
+ *       {"article_id": "SKU-693856", "units": 6 },
+ *     ]
+ *   }
+ * cannot be filled since inventory of the second item: "SKU-693856"
+ * is only 4 units, insufficient to meet the 6 units ordered.
+ * 
  */
+public interface InventoryManager {
 
-public interface InventoryManager extends DataRepository.ArticleRepository {
-
-
-	/**
-	 * Return units in stock for given article.
-	 * 
-	 * @param id article identifier.
-	 * @return units in stock of article.
-	 * @throws IllegalArgumentException if id is null or id does not exist.
-	 */
-	int getUnitsInStock( String id );
-
-
-	/**
-	 * Update inventory for article.
-	 * 
-	 * @param id article identifier.
-	 * @param updatedUnitsInStock update with number (must be {@code >= 0}).
-	 * @throws IllegalArgumentException if id is null, id does not exist or unitsInStock is {@code < 0}).
-	 */
-	void update( String id, int updatedUnitsInStock );
+    /**
+     * Verify that sufficient inventory is available for all items
+     * of an order.
+     * 
+     * @param order to verify sufficient inventory for all order items.
+     * @return true if sufficient inventory is available for all order items.
+     * @throws AssertionError if order is not fillable.
+     */
+    public boolean isFillable(Order order);
 
 
-	/**
-	 * Test that order is fillable.
-	 * 
-	 * An order is fillable when all order items meet the condition:
-	 * {@code orderItem.unitsOrdered <= inventory(article).unitsInStock}.
-	 * 
-	 * @param order to validate.
-	 * @return true if order is fillable from current inventory.
-	 * @throws IllegalArgumentException if order is null.
-	 */
-	boolean isFillable( Order order );
-
-
-	/**
-	 * Fills order by deducting all order items from the inventory, if the
-	 * order is fillable. If the order is not fillable, inventory remains
-	 * unchanged (transactional behavior: all or none order item is filled).
-	 * 
-	 * @param order to fill.
-	 * @return true if order has been filled, false otherwise.
-	 * @throws IllegalArgumentException if order is null.
-	 */
-	boolean fill( Order order );
-
-
-	/**
-	 * Print inventory as table.
-	 * 
-	 * @return printed inventory (as table).
-	 */
-	StringBuffer printInventory();
-
-
-	/**
-	 * Print inventory as table with sorting and limiting criteria.
-	 * 
-	 * @param sortedBy sorting criteria 1: byPrice; 2: byValue; 3: byUnits; 4: byDescription; 5: bySKU; else: unsorted
-	 * @param decending true if in descending order
-	 * @param limit upper boundary of articles printed after sorting
-	 * @return printed inventory (as table).
-	 */
-
-	StringBuffer printInventory( int sortedBy, boolean decending, Integer... limit );
+    /**
+     * Reduce inventory by the number of items of a ordered.
+     * 
+     * @param order order to fill.
+     * @return true if inventory was reduced by ordered units. 
+     */
+    public void fill(Order order);
 
 }

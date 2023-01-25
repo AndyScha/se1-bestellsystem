@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import datamodel.Article;
 import datamodel.Customer;
+import datamodel.InventoryItem;
 import datamodel.Order;
 import datamodel.TAX;
 import system.DatamodelFactory;
@@ -98,10 +99,12 @@ class OrderBuilderJSONImpl implements OrderBuilder {
 			String customerFile = buildFilePath("data.path", "data.customers");
 			String articleFile = buildFilePath("data.path", "data.articles");
 			String orderFile = buildFilePath("data.path", "data.orders");
+			String inventoryFile = buildFilePath("data.path", "data.inventory");
 			//
 			read(customerFile, jn -> createCustomer(jn));
 			read(articleFile, jn -> createArticle(jn));
 			read(orderFile, jn -> createOrder(jn));
+			read(inventoryFile, jn -> createInventory(jn));
 			loaded = true;
 		}
 		return this;
@@ -175,6 +178,29 @@ class OrderBuilderJSONImpl implements OrderBuilder {
 			}
 			//
 			return Optional.of(article);
+		}
+		return Optional.empty();
+	}
+
+
+	/**
+	 * Create Inventory object from JsonNode.
+	 * 
+	 * @param jn JsonNode of Inventory object to create.
+	 * @return Optional with created Inventory object.
+	 */
+	private Optional<InventoryItem> createInventory(final JsonNode jn) {
+		//
+		String article_id = Optional.ofNullable(jn.get("article_id")).map(jn2 -> jn2.asText()).orElse(null);
+		// String descr = Optional.ofNullable(jn.get("descr")).map(jn2 -> jn2.asText()).orElse(null);
+		long unitsInStock = Optional.ofNullable(jn.get("unitsInStock")).map(jn2 -> jn2.asLong()).orElse(-1L);
+		Optional<Article> article = article_id != null? factory.findArticleById(article_id) : Optional.empty();
+		//
+		if(article.isPresent() && unitsInStock >= 0) {
+			//
+			InventoryItem inventory_item = factory.createInventoryItem(article.get(), unitsInStock);
+			//
+			return Optional.of(inventory_item);
 		}
 		return Optional.empty();
 	}

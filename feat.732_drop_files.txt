@@ -1,0 +1,17 @@
+./.gitignore
+./data/inventory.json
+./feat.732_drop_files.txt
+./README.md
+./resources/application.properties
+./src/application/Application_G5.java
+./src/datamodel/InventoryItem.java
+./src/system/DatamodelFactory.java
+./src/system/impl/DatamodelFactoryImpl.java
+./src/system/impl/InventoryManagerImpl.java
+./src/system/impl/IoC_ContainerImpl.java
+./src/system/impl/OrderBuilderJSONImpl.java
+./src/system/impl/PrinterImpl.java
+./src/system/impl/RepositoryImpl.java
+./src/system/InventoryManager.java
+./src/system/Printer.java
+./src/system/Repository.java

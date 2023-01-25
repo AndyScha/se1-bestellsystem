@@ -3,12 +3,13 @@ package system.impl;
 import java.util.*;
 
 import datamodel.Customer;
+import datamodel.InventoryItem;
 import datamodel.Article;
 import datamodel.Order;
 import system.DatamodelFactory;
 
 /**
- * Factory that creates instances of objects of the {@link datamodel} package.
+ * Factory that creates instances of classes of the {@link datamodel} package.
  * 
  * @version <code style=color:green>{@value application.package_info#Version}</code>
  * @author <code style=color:blue>{@value application.package_info#Author}</code>
@@ -22,6 +23,13 @@ class DatamodelFactoryImpl implements DatamodelFactory {
 	private final List<Customer> customers = new ArrayList<Customer>();
 	private final List<Article> articles = new ArrayList<Article>();
 	private final List<Order> orders = new ArrayList<Order>();
+	private final List<InventoryItem> inventoryItems = new ArrayList<InventoryItem>();
+
+
+	/**
+	 * None-public constructor.
+	 */
+	DatamodelFactoryImpl() { }
 
 
 	/**
@@ -75,6 +83,32 @@ class DatamodelFactoryImpl implements DatamodelFactory {
 	@Override
 	public Order createOrder(Customer customer) { return add(new Order(customer)); }
 
+	
+	/**
+	 * Factory method to construct InventoryItem. Inventory items represent currently
+	 * available units of articles.
+	 * 
+	 * @param article for which currently available units are represented.
+	 * @param unitsInStock units of article in store, negative values are illegal
+	 * @return inventory item for article.
+	 * @throws IllegalArgumentException when article is null or unitsInStock is negative.
+	 */
+	@Override
+	public InventoryItem createInventoryItem(Article article, long unitsInStock) {
+		var item = new InventoryItem(article, unitsInStock);
+		inventoryItems.add(item);
+		return item;
+	}
+
+
+	/**
+	 * Getter method to return created InventoryItems.
+	 * 
+	 * @return inventory items.
+	 */
+	@Override
+	public List<InventoryItem> getInventoryItems() { return inventoryItems; }
+
 
 	/**
 	 * Getter method to return created Customer objects.
@@ -119,6 +153,14 @@ class DatamodelFactoryImpl implements DatamodelFactory {
 	 */
 	@Override
 	public int articlesCount() { return articles.size(); }
+
+
+	/**
+	 * Return number of created inventory items.
+	 * 
+	 * @return number of created InventoryItem objects.
+	 */
+	public int inventoryCount() { return inventoryItems.size(); }
 
 
 	/**
@@ -190,5 +232,4 @@ class DatamodelFactoryImpl implements DatamodelFactory {
 		orders.add(order);
 		return order;
 	}
-
 }

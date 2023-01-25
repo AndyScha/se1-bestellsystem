@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.function.Consumer;
 
 import datamodel.Customer;
+import datamodel.InventoryItem;
 import datamodel.Article;
 import datamodel.Order;
 
@@ -35,10 +36,10 @@ public interface Printer {
 	 * </pre>
 	 * 
 	 * @param sb StringBuffer that will contains the formatted result. A new StringBuffer is created when sb is null.
-	 * @param customer Customer object.
+	 * @param c Customer object.
 	 * @return StringBuffer that contains formatted result (same sb).
 	 */
-	public StringBuffer printCustomer(StringBuffer sb, Customer customer);
+	public StringBuffer printCustomer(final StringBuffer sb, final Customer c);
 
 
 	/**
@@ -54,37 +55,37 @@ public interface Printer {
 	 * @param customers collection of Customers (null argument is ignored).
 	 * @return StringBuffer that contains formatted result (same sb).
 	 */
-	public StringBuffer printCustomers(StringBuffer sb, Collection<Customer> customers);
+	public StringBuffer printCustomers(final StringBuffer sb, final Collection<Customer> customers);
 
 
 	/**
 	 * Print attributes of one Article object into StringBuffer as column-separated line.
 	 * <pre>
 	 * Example:
-	 * | SKU-458362 | Tasse                      |    299  |  19% MwSt|
+	 * | SKU-458362 | Tasse                      |    2.99€|  19% MwSt|
 	 * </pre>
 	 * 
 	 * @param sb StringBuffer that will contains the formatted result. A new StringBuffer is created when sb is null.
-	 * @param article Article object
+	 * @param a Article object
 	 * @return StringBuffer that contains formatted result (same sb).
 	 */
-	public StringBuffer printArticle(StringBuffer sb, Article article);
+	public StringBuffer printArticle(final StringBuffer sb, final Article a);
 
 
 	/**
 	 * Print collection of Article objects into StringBuffer as lines with Article attributes.
 	 * <pre>
 	 * Example:
-	 * | SKU-458362 | Tasse                      |    299  |  19% MwSt|
-	 * | SKU-693856 | Becher                     |    149  |  19% MwSt|
-	 * | SKU-278530 | Buch "Java"                |   4990  |   7% MwSt|
+	 * | SKU-458362 | Tasse                      |    2.99€|  19% MwSt|
+	 * | SKU-693856 | Becher                     |    1.49€|  19% MwSt|
+	 * | SKU-278530 | Buch "Java"                |   49.90€|   7% MwSt|
 	 * </pre>
 	 * 
 	 * @param sb StringBuffer that will contains the formatted result. A new StringBuffer is created when sb is null.
 	 * @param articles collection of Articles (null argument is ignored).
 	 * @return StringBuffer that contains formatted result (same sb).
 	 */
-	public StringBuffer printArticles(StringBuffer sb, Collection<Article> articles);
+	public StringBuffer printArticles(final StringBuffer sb, final Collection<Article> articles);
 
 
 	/**
@@ -98,7 +99,7 @@ public interface Printer {
 	 * @param order Order object
 	 * @return StringBuffer that contains formatted result (same sb).
 	 */
-	public StringBuffer printOrder(StringBuffer sb, Order order);
+	public StringBuffer printOrder(final StringBuffer sb, final Order order);
 
 
 	/**
@@ -115,7 +116,7 @@ public interface Printer {
 	 * @param orders collection of Orders (null argument is ignored).
 	 * @return StringBuffer that contains formatted result (same sb).
 	 */
-	public StringBuffer printOrders(StringBuffer sb, Collection<Order> orders);
+	public StringBuffer printOrders(final StringBuffer sb, final Collection<Order> orders);
 
 
 	/**
@@ -126,10 +127,10 @@ public interface Printer {
 	 * |Bestell-ID|Bestellungen                  MwSt      Preis|     MwSt     Gesamt|
 	 * +----------+---------------------------------------------+--------------------+
 	 * |8592036245|Eric's Bestellung                            |                    |
-	 * |          | - 4 Teller, 4x 6.49          4.14     25.96 |                    |
-	 * |          | - 8 Becher, 8x 1.49          1.90     11.92 |                    |
-	 * |          | - 1 Buch "OOP"               5.23*    79.95 |                    |
-	 * |          | - 4 Tasse, 4x 2.99           1.91     11.96 |   13.18     129.79 |
+	 * |          | - 4 Teller, 4x 6.49          4.14     25.96€|                    |
+	 * |          | - 8 Becher, 8x 1.49          1.90     11.92€|                    |
+	 * |          | - 1 Buch "OOP"               5.23*    79.95€|                    |
+	 * |          | - 4 Tasse, 4x 2.99           1.91     11.96€|   13.18€    129.79€|
 	 * +----------+---------------------------------------------+--------------------+
 	 * </pre>
 	 * 
@@ -137,7 +138,7 @@ public interface Printer {
 	 * @param order order printed into {@code orderTable}, (null argument is ignored).
 	 * @return {@link TablePrinter} that contains formatted result.
 	 */
-	public TablePrinter printOrder(TablePrinter orderTable, Order order);
+	public TablePrinter printOrder(final TablePrinter orderTable, final Order order);
 
 
 	/**
@@ -148,16 +149,16 @@ public interface Printer {
 	 * |Bestell-ID|Bestellungen                  MwSt      Preis|     MwSt     Gesamt|
 	 * +----------+---------------------------------------------+--------------------+
 	 * |8592356245|Eric's Bestellung:                           |                    |
-	 * |          | - 4 Teller, 4x 6.49          4.14     25.96 |                    |
-	 * |          | - 8 Becher, 8x 1.49          1.90     11.92 |                    |
-	 * |          | - 1 Buch "OOP"               5.23*    79.95 |                    |
-	 * |          | - 4 Tasse, 4x 2.99           1.91     11.96 |   13.18     129.79 |
+	 * |          | - 4 Teller, 4x 6.49          4.14     25.96€|                    |
+	 * |          | - 8 Becher, 8x 1.49          1.90     11.92€|                    |
+	 * |          | - 1 Buch "OOP"               5.23*    79.95€|                    |
+	 * |          | - 4 Tasse, 4x 2.99           1.91     11.96€|   13.18€    129.79€|
 	 * +----------+---------------------------------------------+--------------------+
 	 * |3563561357|Anne's Bestellung:                           |                    |
-	 * |          | - 2 Teller, 2x 6.49          2.07     12.98 |                    |
-	 * |          | - 2 Tasse, 2x 2.99           0.95      5.98 |    3.02      18.96 |
+	 * |          | - 2 Teller, 2x 6.49          2.07     12.98€|                    |
+	 * |          | - 2 Tasse, 2x 2.99           0.95      5.98€|    3.02€     18.96€|
 	 * +----------+---------------------------------------------+--------------------+
-	 *  {@code >>>>>>>>>>}                                       Gesamt:|   16.20     148.75 |
+	 *  {@code >>>>>>>>>>}                                       Gesamt:|   16.20€    148.75€|
 	 *                                                          +====================+
 	 * </pre>
 	 * 
@@ -165,6 +166,35 @@ public interface Printer {
 	 * @param orders collection of orders printed into {@code orderTable}, (null argument is ignored).
 	 * @return {@link TablePrinter} that contains formatted result.
 	 */
-	public TablePrinter printOrders(TablePrinter orderTable, Collection<Order> orders);
+	public TablePrinter printOrders(final TablePrinter orderTable, final Collection<Order> orders);
+
+
+	/**
+	 * Print inventory into TablePrinter with order item separated lines.
+	 * <pre>
+	 * Example:
+	 * +----------+-----------------------------+---------+-----------+-----------+
+	 * |Inv.-Id   |Article / Unit               |     Unit|      Units|      Value|
+	 * |          |                             |    Price|   in-Stock|     (in €)|
+	 * +----------+-----------------------------+---------+-----------+-----------+
+	 * |SKU-693856|Becher                       |    2.49€|        428|  1,065.72€|
+	 * |SKU-638035|Teller                       |    8.49€|          5|     42.45€|
+	 * |SKU-425378|Buch "OOP"                   |   99.95€|          1|     99.95€|
+	 * |SKU-300926|Pfanne                       |   69.99€|         86|  6,019.14€|
+	 * |SKU-458362|Tasse                        |    4.99€|        137|    683.63€|
+	 * |SKU-278530|Buch "Java"                  |   69.90€|          0|      0.00€|
+	 * |SKU-518957|Kanne                        |   29.99€|         96|  2,879.04€|
+	 * |SKU-663942|Fahrradhelm                  |  199.00€|         49|  9,751.00€|
+	 * |SKU-583978|Fahrradkarte                 |    8.95€|         38|    340.10€|
+	 * +----------+-----------------------------+---------+-----------+-----------+
+	 *  >>>>>>>>>>                                              Value:| 20,881.03€|
+	 *                                                                +===========+
+	 * </pre>
+	 * 
+	 * @param inventoryTable to print order into.
+	 * @param items items printed into {@code inventoryTable}, (null argument is ignored).
+	 * @return {@link TablePrinter} with formatted result.
+	 */
+	public TablePrinter printInventoryItems(final TablePrinter inventoryTable, final Collection<InventoryItem> item);
 
 }

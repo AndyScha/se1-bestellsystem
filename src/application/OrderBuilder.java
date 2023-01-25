@@ -1,248 +1,158 @@
 package application;
 
-import system.RTE.Runtime;
-import system.Calculator;
-import system.DataRepository.CustomerRepository;
-
 import datamodel.Article;
-import datamodel.Currency;
 import datamodel.Customer;
-import datamodel.Order;
-import system.DataRepository.OrderRepository;
-import system.Formatter;
-import system.InventoryManager;
+import datamodel.TAX;
 
 
 /**
- * Singleton component that builds orders and stores them in the
- * OrderRepository.
+ * OrderBuilder builds sample orders using objects from the {@link datamodel} package.
  * 
- * @author sgra64
- *
+ * @version <code style=color:green>{@value application.package_info#Version}</code>
+ * @author <code style=color:blue>{@value application.package_info#Author}</code>
  */
 
 public class OrderBuilder {
 
 	/**
-	 * static singleton reference to OrderBuilder instance (singleton pattern).
+	 * Factory from which objects are built.
 	 */
-	private static OrderBuilder orderBuilder_instance = null;
-
-	/**
-	 * Repository dependencies.
-	 */
-	private final CustomerRepository customerRepository;
-	//
-//	private final ArticleRepository articleRepository;
-	private final InventoryManager inventoryManager;
-	//
-	private final OrderRepository orderRepository;
-	//
-	private final Calculator calculator;
-	//
-	private final Formatter formatter;
+	private final DatamodelFactory factory;
 
 
 	/**
-	 * Provide access to RTE OrderBuilder singleton instance (singleton pattern).
+	 * Public constructor.
 	 * 
-	 * @param runtime dependency to resolve Repository dependencies.
-	 * @return
+	 * @param factory factory from which objects are built.
 	 */
-	public static OrderBuilder getInstance( Runtime runtime ) {
-		if( orderBuilder_instance == null ) {
-			orderBuilder_instance = new OrderBuilder( runtime );
-		}
-		return orderBuilder_instance;
+	public OrderBuilder(DatamodelFactory factory) {
+		this.factory = factory;
 	}
 
 
 	/**
-	 * Private constructor to prevent external instantiation (singleton pattern).
+	 * Method to build a first set of Customer, Article and Order objects.
 	 * 
-	 * @param runtime dependency injected from where repository
-	 * dependencies are resolved.
+	 * @return chainable self-reference.
 	 */
-	private OrderBuilder( Runtime runtime ) {
-		this.customerRepository = runtime.getCustomerRepository();
-//		this.articleRepository = runtime.getArticleRepository();
-		this.inventoryManager = runtime.getInventoryManager();
-		this.orderRepository = runtime.getOrderRepository();
-		this.calculator = runtime.getCalculator();
-		this.formatter = runtime.getPrinter().createFormatter();
-	}
-
-
-	/**
-	 * Save order to OrderRepository if order is fillable (all order items
-	 * can be allocated from current inventory).
-	 * 
-	 * @param order saved to OrderRepository
-	 * @return chainable self-reference
-	 */
-	public boolean accept( Order order ) {
-		long orderValue = calculator.calculateValue( order );
+	public OrderBuilder buildOrders() {
 		//
-		boolean isFillable = inventoryManager.isFillable( order );
-		if( isFillable && (
-				isFillable = inventoryManager.fill( order )
-		) ) {
-			StringBuffer fmtValue = formatter.fmtPaddedPrice( orderValue, 12, ' ', Currency.NONE );
-			System.out.println( "Order: " + order.getId() + " filled:" + fmtValue.toString() );
-			orderRepository.save( order );	// save filled order
-		} else {
-			StringBuffer fmtValue = formatter.fmtPrice( orderValue, Currency.NONE );
-			System.err.println( "Order: " + order.getId() + " is not fillable from current inventory: " + fmtValue.toString() );
-		}
-		return isFillable;
-	}
-
-
-	/**
-	 * Build and save orders to OrderRepository.
-	 * 
-	 * @param order saved to OrderRepository
-	 * @return chainable self-reference
-	 */
-	public OrderBuilder build() {
-
-		CustomerRepository crep = customerRepository;
-		/*
-		 * Look up customers from CustomerRepository.
-		 */
-		Customer eric = crep.findById( 892474 ).get();
-		Customer anne = crep.findById( 643270 ).get();
-		Customer tim = crep.findById( 286516 ).get();
-		Customer nadine = crep.findById( 412396 ).get();
-		Customer khaled = crep.findById( 456454 ).get();
-		Customer lena = crep.findById( 556849 ).get();
-		Customer max = crep.findById( 482596 ).get();
-		Customer brigitte = crep.findById( 660380 ).get();
-		Customer joel = crep.findById( 582596 ).get();
-
-//		ArticleRepository arep = articleRepository;
-		InventoryManager arep = inventoryManager;
-		/*
-		 * Look up articles from ArticleRepository.
-		 */
-		Article tasse = arep.findById( "SKU-458362" ).get();
-		Article becher = arep.findById( "SKU-693856" ).get();
-		Article kanne = arep.findById( "SKU-518957" ).get();
-		Article teller = arep.findById( "SKU-638035" ).get();
-		Article buch_Java = arep.findById( "SKU-278530" ).get();
-		Article buch_OOP = arep.findById( "SKU-425378" ).get();
-		Article pfanne = arep.findById( "SKU-300926" ).get();
-		Article helm = arep.findById( "SKU-663942" ).get();
-		Article karte = arep.findById( "SKU-583978" ).get();
-
-		/*
-		 * Build orders.
-		 */
-
-		// Eric's 1st order
-		Order o8592 = new Order( eric )	// new order for Eric
-				.setId( "8592356245" )	// assign order-id: 8592356245
+		// creating Customers:
+		Customer eric = factory.createCustomer("Eric Meyer")
+			.setId(892474L)
+			.addContact("eric98@yahoo.com")
+			.addContact("(030) 3945-642298");
+		//
+		Customer anne = factory.createCustomer("Bayer, Anne")
+			.setId(643270L)
+			.addContact("anne24@yahoo.de")
+			.addContact("(030) 3481-23352")
+			.addContact("fax: (030)23451356");
+		//
+		factory.createCustomer("Tim Schulz-Mueller")
+			.setId(286516L)
+			.addContact("tim2346@gmx.de");
+		//
+		Customer nadine = factory.createCustomer("Nadine-Ulla Blumenfeld")
+			.setId(412396L)
+			.addContact("+49 152-92454");
+		//
+		factory.createCustomer()
+			.setName("Khaled Saad Mohamed Abdelalim")
+			.setId(456454L)
+			.addContact("+49 1524-12948210");
+		//
+		// creating Articles:
+		Article tasse  = factory.createArticle("Tasse",  299).setId("SKU-458362");
+		Article becher = factory.createArticle("Becher", 149).setId("SKU-693856");
+		Article kanne  = factory.createArticle("Kanne", 1999).setId("SKU-518957");
+		Article teller = factory.createArticle("Teller", 649).setId("SKU-638035");
+		//
+		Article buch_Java = factory.createArticle("Buch \"Java\"", 4990).setId("SKU-278530")
+				.setTax(TAX.GER_VAT_REDUCED);	// reduced tax rate for books
+		//
+		Article buch_OOP = factory.createArticle("Buch \"OOP\"", 7995).setId("SKU-425378")
+				.setTax(TAX.GER_VAT_REDUCED);	// reduced tax rate for books
+		//
+		// creating Orders:
+		//
+		// Eric's 1st order, o8592
+		factory.createOrder(eric)	// new order for Eric
+				.setId("8592356245")	// assign order-id: 8592356245
 				// add items to order
-				.addItem( teller, 4 )	// 4 Teller, 4x 6.49 €
-				.addItem( becher, 8 )	// 8 Becher, 8x 1.49 €
-				.addItem( buch_OOP, 1 )	// 1 Buch "OOP", 1x 79.95 €, 7% MwSt (5.23€)
-				.addItem( tasse, 4 );	// 4 Tassen, 4x 2.99 €
+				.addItem(teller, 4)		// 4 Teller, 4x 6.49 €
+				.addItem(becher, 8)		// 8 Becher, 8x 1.49 €
+				.addItem(buch_OOP, 1)	// 1 Buch "OOP", 1x 79.95 €, 7% MwSt (5.23€)
+				.addItem(tasse, 4);		// 4 Tassen, 4x 2.99 €
 		//
-		// Anne's order
-		Order o3563 = new Order( anne )
-				.setId( "3563561357" )
-				.addItem( teller, 2 )
-				.addItem( tasse, 2 );
+		// Anne's order, o3563
+		factory.createOrder(anne)
+				.setId("3563561357")
+				.addItem(teller, 2)
+				.addItem(tasse, 2);
 		//
-		// Eric's 2nd order
-		Order o5234 = new Order( eric )
-				.setId( "5234968294" )
-				.addItem( kanne, 1 );
+		// Eric's 2nd order, o5234
+		factory.createOrder(eric)
+				.setId("5234968294")
+				.addItem(kanne, 1);
 		//
-		// Nadine's order
-		Order o6135 = new Order( nadine )
-				.setId( "6135735635" )
-				.addItem( teller, 12 )
-				.addItem( buch_Java, 1 )
-				.addItem( buch_OOP, 1 );
+		// Nadine's order, o6135
+		factory.createOrder(nadine)
+				.setId("6135735635")
+				.addItem(teller, 12)
+				.addItem(buch_Java, 1)
+				.addItem(buch_OOP, 1);
 		//
-		// Eric's 3rd order
-		Order o7356 = new Order( eric )
-				.setId( "7356613535" )
-				.addItem( helm, 1 )
-				.addItem( karte, 1 );
-		//
-		// Eric's 4th order
-		Order o4450 = new Order( eric )
-				.setId( "4450735661" )
-				.addItem( tasse, 3 )
-				.addItem( becher, 3 )
-				.addItem( kanne, 1 );
-		//
-		// Lena's 1sr order
-		Order o6173 = new Order( lena )
-				.setId( "6173535635" )
-				.addItem( buch_Java, 1 )
-				.addItem( karte, 1 );
-		//
-		// Tim's 1sr order
-		Order o6174 = new Order( tim )
-				.setId( "6356351735" )
-				.addItem( buch_Java, 1 )
-				.addItem( buch_OOP, 1 );
-		//
-		// Khaled's 1sr order
-		Order o6175 = new Order( khaled )
-				.setId( "3563617355" )
-				.addItem( teller, 4 )
-				.addItem( becher, 4 )
-				.addItem( pfanne, 1 );
-		//
-		// Brigitte's 1sr order
-		Order o6176 = new Order( brigitte )
-				.setId( "4434573683" )
-				.addItem( teller, 6 )
-				.addItem( tasse, 6 );
-		//
-		// Joel's 1sr order
-		Order o6177 = new Order( joel )
-				.setId( "5356173635" )
-				.addItem( buch_Java, 1 )
-				.addItem( karte, 1);
-		//
-		// Max's 1sr order
-		Order o6178 = new Order( max )
-				.setId( "9356736867" )
-				.addItem( helm, 1 )
-				.addItem( karte, 2 )
-				.addItem( buch_Java, 1 );
-		//
-		// Lena's 2nd order
-		Order o6179 = new Order( lena )
-				.setId( "5356617335" )
-				.addItem( teller, 12 )
-				.addItem( tasse, 12 )
-				.addItem( pfanne, 2 );
-
-		/*
-		 * Save orders to OrderRepository.
-		 */
-		accept( o8592 );
-		accept( o3563 );
-		accept( o5234 );
-		accept( o6135 );
-		accept( o7356 );
-		accept( o4450 );
-		accept( o6173 );	// total value (all orders):  |   642.70€|   76.78€|
-		//
-//		accept( o6174 );
-//		accept( o6175 );
-//		accept( o6176 );
-//		accept( o6177 );
-//		accept( o6178 );
-//		accept( o6179 );	// total value (all orders):  | 1,414.73€|  176.40€|
-
 		return this;
 	}
 
+
+	/**
+	 * Method to build another set of Customer, Article and Order objects.
+	 * 
+	 * @return chainable self-reference.
+	 */
+	public OrderBuilder buildMoreOrders() {
+		//
+		// find customers and articles needed to build more orders
+		Customer eric = factory.findCustomerById(892474L).get();
+		Article tasse = factory.findArticleById("SKU-458362").get();
+		Article becher = factory.findArticleById("SKU-693856").get();
+		Article kanne = factory.findArticleById("SKU-518957").get();
+		Article buch_Java = factory.findArticleById("SKU-278530").get();
+		//
+		factory.createArticle("Pfanne", 4999).setId("SKU-300926");
+		Article helm = factory.createArticle("Fahrradhelm", 16900).setId("SKU-663942");
+		Article karte = factory.createArticle("Fahrradkarte", 695).setId("SKU-583978")
+				.setTax(TAX.GER_VAT_REDUCED);	// reduced tax rate for books
+		//
+		// Eric's 3rd order, o7356
+		factory.createOrder(eric)
+				.setId("7372561535")
+//					.setCreationDate(parseDateTime("12/26/2021 14:01:09"))
+				.addItem(helm, 1)
+				.addItem(karte, 1);
+		//
+		// Eric's 4th order, o4450
+		factory.createOrder(eric)
+				.setId("4450305661")
+//					.setCreationDate(parseDateTime("04/08/2021 04:21:18"))
+				.addItem(tasse, 3)
+				.addItem(becher, 3)
+				.addItem(kanne, 1);
+
+		// new Customer Lena
+		Customer lena = factory.createCustomer("Lena Neumann")
+				.setId(651286L)
+				.addContact("lena228@gmail.com");
+		//
+		// Lena's order, o6173
+		factory.createOrder(lena)
+				.setId("6173043537")
+//					.setCreationDate(parseDateTime("02/12/2022 18:07:02"))
+				.addItem(buch_Java, 1)
+				.addItem(karte, 1);
+		//
+		return this;
+	}
 }
